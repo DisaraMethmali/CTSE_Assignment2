@@ -1,4 +1,3 @@
-"""view_results.py — Modern blue/white recruiter dashboard."""
 from __future__ import annotations
 import json
 from pathlib import Path
