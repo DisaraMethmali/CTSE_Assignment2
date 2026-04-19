@@ -43,7 +43,7 @@ def run_member3(
     For each candidate this agent:
         1. Calls calculate_candidate_score() for a deterministic base score.
         2. Calls detect_risk_flags() to find specific risk concerns.
-        3. Calls HuggingFace API (Phi-3) for judgment and rationale.
+        3. Calls Ollama/llama3.2:1b API for judgment and rationale.
         4. Validates output and writes scored_candidates to shared state.
 
     Args:
@@ -96,7 +96,7 @@ def run_member3(
             output_summary = f"flags={risk_flags}",
         )
 
-        # LLM call — judgment via HuggingFace API
+        # LLM call — judgment via Ollama/llama3.2:1b API
         user_prompt = f"""Candidate profile:
 {json.dumps(candidate, indent=2)}
 
@@ -114,7 +114,7 @@ Review the base score and risk flags.
 Adjust by up to +/- 10 points if justified.
 Return the final scoring JSON."""
 
-        print(f"  Calling HuggingFace API for: {name}")
+        print(f"  Calling Ollama/llama3.2:1b API for: {name}")
 
         try:
             raw_output = call_llm(
@@ -134,7 +134,7 @@ Return the final scoring JSON."""
 
             log_agent_event(
                 agent_name     = "Member3_RiskScoring",
-                tool_called    = "HuggingFace/Phi-3-mini",
+                tool_called    = "Ollama/llama3.2:1b",
                 input_summary  = f"Candidate: {name}",
                 output_summary = f"final_score={scored['final_score']} risk={scored.get('risk_level')}",
             )
@@ -150,7 +150,7 @@ Return the final scoring JSON."""
                 "adjustment_reason": "LLM unavailable — tool score used as fallback.",
                 "risk_level":        score_data["risk_level"],
                 "risk_flags":        risk_flags,
-                "score_reasoning":   "Automated fallback score. LLM call failed.",
+                "score_reasoning":   "Automated fallback score.",
             })
 
     state["scored_candidates"] = scored_candidates

@@ -1,33 +1,9 @@
 """
-llm_client.py — Hugging Face Inference API client.
-Replaces ollama for all agents. Zero local model storage needed.
+llm_client.py — Ollama local LLM client.
+Runs entirely on your machine. No API keys needed.
 """
 from __future__ import annotations
-import os
 import requests
-from pathlib import Path
-
-
-def _load_token() -> str:
-    """
-    Load HuggingFace API token from .env file or environment variable.
-
-    Returns:
-        API token string.
-
-    Raises:
-        ValueError: If token is not found anywhere.
-    """
-    token = os.environ.get("HF_TOKEN", "")
-    if not token:
-        env_file = Path(".env")
-        if env_file.exists():
-            for line in env_file.read_text().splitlines():
-                if line.startswith("HF_TOKEN="):
-                    token = line.split("=", 1)[1].strip()
-    if not token:
-        raise ValueError("HF_TOKEN not found. Add it to your .env file.")
-    return token
 
 
 def call_llm(
@@ -38,49 +14,48 @@ def call_llm(
     temperature: float = 0.1,
 ) -> str:
     """
-    Send a prompt to a HuggingFace model via the free Inference API.
+    Send a prompt to a locally running Ollama model.
 
     Args:
         system_prompt: The agent system instructions.
         user_prompt:   The task and data to process.
-        model:         HuggingFace model repo ID.
+        model:         Ollama model name (must be pulled first).
         max_tokens:    Maximum tokens to generate.
-        temperature:   Sampling temperature. Lower is more deterministic.
+        temperature:   Sampling temperature.
 
     Returns:
         Generated text response as a string.
 
     Raises:
-        RuntimeError: If the API call fails.
+        RuntimeError: If Ollama is not running or the call fails.
     """
-    token   = _load_token()
-    api_url = (
-        f"https://api-inference.huggingface.co/models/{model}/v1/chat/completions"
-    )
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type":  "application/json",
-    }
+    api_url = "http://localhost:11434/api/chat"
     payload = {
         "model": model,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
         ],
-        "max_tokens":  max_tokens,
-        "temperature": temperature,
-        "stream":      False,
+        "options": {
+            "temperature": temperature,
+            "num_predict": max_tokens,
+        },
+        "stream": False,
     }
     try:
-        response = requests.post(api_url, headers=headers, json=payload, timeout=60)
+        response = requests.post(api_url, json=payload, timeout=120)
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"].strip()
+        return response.json()["message"]["content"].strip()
+    except requests.exceptions.ConnectionError:
+        raise RuntimeError(
+            "Cannot connect to Ollama. Make sure it is running."
+        )
     except requests.exceptions.Timeout:
-        raise RuntimeError("HuggingFace API timed out. Try again.")
+        raise RuntimeError("Ollama timed out.")
     except requests.exceptions.HTTPError as exc:
-        raise RuntimeError(f"HuggingFace API error: {exc} — {response.text}")
+        raise RuntimeError(f"Ollama API error: {exc}")
     except (KeyError, IndexError) as exc:
-        raise RuntimeError(f"Unexpected API response: {exc}")
+        raise RuntimeError(f"Unexpected Ollama response: {exc}")
 
 
 def clean_json_response(raw: str) -> str:
@@ -96,7 +71,7 @@ def clean_json_response(raw: str) -> str:
     raw = raw.strip()
     if raw.startswith("```"):
         parts = raw.split("```")
-        raw   = parts[1]
+        raw = parts[1]
         if raw.startswith("json"):
             raw = raw[4:]
     return raw.strip()
