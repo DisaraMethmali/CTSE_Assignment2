@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Anne Perera",
+    "score": 91,
+    "risk_level": "Low",
+    "risk_flags": [],
+    "fit_reasoning": "Matches all core skills and exceeds experience requirement.",
+    "score_reasoning": "Excellent alignment with the role.",
+    "rank": 1
+  },
+  {
+    "name": "John Silva",
+    "score": 78,
+    "risk_level": "Medium",
+    "risk_flags": [
+      "Missing critical skill: Docker"
+    ],
+    "fit_reasoning": "Strong backend fit but lacks Docker.",
+    "score_reasoning": "Good candidate with one important technical gap.",
+    "rank": 2
+  }
+]

@@ -1,0 +1,21 @@
+1. Role summary
+Backend Developer role requiring Python, SQL, Docker, and 2+ years of experience.
+
+2. Candidate ranking
+- Rank: 1, Name: Anne Perera, Score: 91, Risk level: Low, Fit reasoning: Matches all core skills and exceeds experience requirement, Score reasoning: Excellent alignment with the role.
+- Rank: 2, Name: John Silva, Score: 78, Risk level: Medium, Risk flags: ['Missing critical skill: Docker'], Fit reasoning: Strong backend fit but lacks Docker, Score reasoning: Good candidate with one important technical gap.
+- Rank: 3, Name: Nimal Fernando, Score: 69, Risk level: Medium, Risk flags: ['Limited relevant experience'], Fit reasoning: Some matching skills but lacks depth in required tools. Score reasoning: Moderate suitability with visible weaknesses.
+
+3. Shortlisted candidates
+Anne Perera, John Silva
+
+4. Key strengths
+- Anne Perera: Matches all core skills and exceeds experience requirement, showing excellent alignment with the role.
+- John Silva: Demonstrates strong backend fit despite lacking Docker.
+
+5. Key risks or weaknesses
+- John Silva: Lacks critical skill: Docker.
+- Nimal Fernando: Limited relevant experience.
+
+6. Final recommendation
+Anne Perera should proceed as the strongest candidate. John Silva should also proceed to the next stage, with specific attention to the Docker gap. Nimal Fernando is currently less competitive based on the available scoring results.
