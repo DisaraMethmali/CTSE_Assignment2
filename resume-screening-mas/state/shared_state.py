@@ -15,5 +15,8 @@ class MASState(TypedDict):
     fit_results: list[dict[str, Any]]
     scoring_results: list[dict[str, Any]]
     ranked_candidates: list[dict[str, Any]]
+    shortlisted_candidates: list[dict[str, Any]]
+    ranking_summary: dict[str, Any]
     final_report: str
+    report_metadata: dict[str, Any]
     execution_trace: list[dict[str, Any]]

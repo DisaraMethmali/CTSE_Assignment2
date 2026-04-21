@@ -41,7 +41,10 @@ def main() -> None:
             },
         ],
         "ranked_candidates": [],
+        "shortlisted_candidates": [],
+        "ranking_summary": {},
         "final_report": "",
+        "report_metadata": {},
         "execution_trace": [],
     }
 
@@ -49,10 +52,23 @@ def main() -> None:
 
     print("\n=== Ranked Candidates ===")
     for candidate in updated_state["ranked_candidates"]:
-        print(f"{candidate['name']} - {candidate['score']}")
+        print(
+            f"Rank {candidate['rank']}: "
+            f"{candidate['name']} - Score {candidate['score']} - Risk {candidate.get('risk_level', 'Unknown')}"
+        )
+
+    print("\n=== Shortlisted Candidates ===")
+    for candidate in updated_state["shortlisted_candidates"]:
+        print(f"Rank {candidate['rank']}: {candidate['name']}")
+
+    print("\n=== Ranking Summary ===")
+    print(updated_state["ranking_summary"])
 
     print("\n=== Final Report ===")
     print(updated_state["final_report"])
+
+    print("\n=== Report Metadata ===")
+    print(updated_state["report_metadata"])
 
     print("\n=== Execution Trace Count ===")
     print(len(updated_state["execution_trace"]))

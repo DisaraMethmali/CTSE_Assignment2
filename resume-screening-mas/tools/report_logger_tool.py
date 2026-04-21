@@ -8,14 +8,14 @@ import json
 
 def rank_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
-    Sort candidates by score in descending order.
+    Sort candidates by score in descending order and assign rank numbers.
 
     Args:
         candidates: List of candidate dictionaries. Each candidate must contain
             a numeric 'score' field.
 
     Returns:
-        A new list sorted from highest score to lowest score.
+        A new list sorted from highest score to lowest score, with 'rank' added.
 
     Raises:
         TypeError: If candidates is not a list.
@@ -25,13 +25,24 @@ def rank_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     if not isinstance(candidates, list):
         raise TypeError("candidates must be a list")
 
+    validated_candidates: list[dict[str, Any]] = []
+
     for candidate in candidates:
+        if not isinstance(candidate, dict):
+            raise TypeError("Each candidate must be a dictionary")
         if "score" not in candidate:
             raise KeyError("Each candidate must contain a 'score' key")
         if not isinstance(candidate["score"], (int, float)):
             raise ValueError("Candidate 'score' must be numeric")
 
-    return sorted(candidates, key=lambda x: x["score"], reverse=True)
+        validated_candidates.append(candidate.copy())
+
+    ranked = sorted(validated_candidates, key=lambda x: x["score"], reverse=True)
+
+    for index, candidate in enumerate(ranked, start=1):
+        candidate["rank"] = index
+
+    return ranked
 
 
 def generate_shortlist(
@@ -49,8 +60,8 @@ def generate_shortlist(
         The shortlisted candidates.
 
     Raises:
-        ValueError: If top_n is less than 1.
         TypeError: If candidates is not a list.
+        ValueError: If top_n is less than 1.
     """
     if not isinstance(candidates, list):
         raise TypeError("candidates must be a list")
@@ -59,6 +70,38 @@ def generate_shortlist(
         raise ValueError("top_n must be at least 1")
 
     return candidates[:top_n]
+
+
+def build_ranking_summary(
+    ranked_candidates: list[dict[str, Any]],
+    shortlist: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """
+    Build a compact summary of ranking results.
+
+    Args:
+        ranked_candidates: Full ranked candidate list.
+        shortlist: Top shortlisted candidates.
+
+    Returns:
+        Summary dictionary containing useful report metadata.
+    """
+    highest_score = ranked_candidates[0]["score"] if ranked_candidates else None
+    lowest_score = ranked_candidates[-1]["score"] if ranked_candidates else None
+
+    risk_distribution: dict[str, int] = {}
+    for candidate in ranked_candidates:
+        risk_level = str(candidate.get("risk_level", "Unknown"))
+        risk_distribution[risk_level] = risk_distribution.get(risk_level, 0) + 1
+
+    return {
+        "total_candidates": len(ranked_candidates),
+        "shortlisted_count": len(shortlist),
+        "highest_score": highest_score,
+        "lowest_score": lowest_score,
+        "risk_distribution": risk_distribution,
+        "generated_at": datetime.utcnow().isoformat(),
+    }
 
 
 def save_report(
@@ -81,6 +124,38 @@ def save_report(
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(report, encoding="utf-8")
+
+
+def save_ranked_candidates(
+    ranked_candidates: list[dict[str, Any]],
+    output_path: str = "outputs/ranked_candidates.json",
+) -> None:
+    """
+    Save ranked candidate data to a JSON file.
+
+    Args:
+        ranked_candidates: Ranked candidate list.
+        output_path: Path where ranked candidates should be saved.
+    """
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(ranked_candidates, indent=2), encoding="utf-8")
+
+
+def save_shortlist(
+    shortlist: list[dict[str, Any]],
+    output_path: str = "outputs/shortlist.json",
+) -> None:
+    """
+    Save shortlisted candidate data to a JSON file.
+
+    Args:
+        shortlist: Shortlisted candidate list.
+        output_path: Path where shortlist should be saved.
+    """
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(shortlist, indent=2), encoding="utf-8")
 
 
 def append_trace_to_state(
@@ -142,3 +217,18 @@ def log_agent_trace_to_file(
 
     with path.open("a", encoding="utf-8") as file:
         file.write(json.dumps(event) + "\n")
+
+def save_ranking_summary(
+    ranking_summary: dict[str, Any],
+    output_path: str = "outputs/ranking_summary.json",
+) -> None:
+    """
+    Save ranking summary data to a JSON file.
+
+    Args:
+        ranking_summary: Ranking summary dictionary.
+        output_path: Path where ranking summary should be saved.
+    """
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(ranking_summary, indent=2), encoding="utf-8")        
