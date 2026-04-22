@@ -1,22 +1,20 @@
 [
   {
-    "name": "Anne Perera",
-    "score": 91,
+    "name": "Kasun Fernando",
+    "score": 65.0,
     "risk_level": "Low",
     "risk_flags": [],
-    "fit_reasoning": "Matches all core skills and exceeds experience requirement.",
-    "score_reasoning": "Excellent alignment with the role.",
+    "fit_reasoning": "Strong match with required backend and infrastructure skills.",
+    "score_reasoning": "The base score is within the acceptable range and does not indicate any significant risk flags. The candidate's skills match most of the required skills, with a few minor gaps in Docker and SQL knowledge.",
     "rank": 1
   },
   {
-    "name": "John Silva",
-    "score": 78,
+    "name": "Anne Perera",
+    "score": 60.0,
     "risk_level": "Medium",
-    "risk_flags": [
-      "Missing critical skill: Docker"
-    ],
-    "fit_reasoning": "Strong backend fit but lacks Docker.",
-    "score_reasoning": "Good candidate with one important technical gap.",
+    "risk_flags": [],
+    "fit_reasoning": "Matches all core skills and exceeds experience requirement.",
+    "score_reasoning": "The base score is within the acceptable range, but the risk flags indicate a need for improvement in Docker and SQL skills. The candidate's experience years exceed the required minimum, which may be beneficial. However, no significant penalties were applied.",
     "rank": 2
   }
 ]

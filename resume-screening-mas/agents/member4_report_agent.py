@@ -63,6 +63,9 @@ def build_report_prompt(
     ranked_candidates: list[dict[str, Any]],
     shortlist: list[dict[str, Any]],
     ranking_summary: dict[str, Any],
+    top_candidate: str,
+    shortlisted_names: list[str],
+    less_competitive_candidate: str,
 ) -> str:
     """
     Build the user prompt sent to the LLM for final report generation.
@@ -72,6 +75,9 @@ def build_report_prompt(
         ranked_candidates: Full ranked candidate list.
         shortlist: Top shortlisted candidates.
         ranking_summary: Ranking metadata summary.
+        top_candidate: Name of the highest-ranked candidate.
+        shortlisted_names: Names of shortlisted candidates.
+        less_competitive_candidate: Name of the lowest-ranked candidate.
 
     Returns:
         Prompt text for the LLM.
@@ -79,9 +85,7 @@ def build_report_prompt(
     ranked_blocks = "\n\n".join(
         build_candidate_snapshot(candidate) for candidate in ranked_candidates
     )
-    shortlist_names = ", ".join(
-        candidate.get("name", "Unknown") for candidate in shortlist
-    )
+    shortlist_names_text = ", ".join(shortlisted_names)
 
     return f"""
 Job description:
@@ -90,8 +94,14 @@ Job description:
 Ranking summary:
 {ranking_summary}
 
+Top candidate:
+{top_candidate}
+
 Official shortlisted candidates:
-{shortlist_names}
+{shortlist_names_text}
+
+Lowest-ranked candidate currently less competitive:
+{less_competitive_candidate}
 
 Only these candidates are shortlisted. Do not include any other candidate in the shortlisted candidates section.
 
@@ -101,14 +111,10 @@ Candidate details:
 Task:
 Write a final hiring report for the recruiter.
 
-Preferred style for final recommendation example:
-Anne Perera should proceed as the strongest candidate. John Silva should also proceed to the next stage, with specific attention to the Docker gap. Nimal Fernando is currently less competitive based on the available scoring results.
-
-The final recommendation must:
-- clearly identify the strongest candidate
-- state which other candidate should proceed to the next stage
-- mention any important technical gap using only provided facts
-- describe lower-ranked candidates as less competitive based on available scoring results
+The final recommendation must follow these exact decisions:
+- Strongest candidate: {top_candidate}
+- Candidates proceeding to the next stage: {shortlist_names_text}
+- Lower-ranked candidate currently less competitive: {less_competitive_candidate}
 
 Use exactly these headings:
 1. Role summary
@@ -124,7 +130,10 @@ Section rules:
 - Do not describe any non-shortlisted candidate as shortlisted.
 - In "Key strengths", focus mainly on shortlisted candidates.
 - In "Key risks or weaknesses", mention notable concerns supported by the input.
-- In "Final recommendation", identify the strongest candidate, who should proceed next, and which lower-ranked candidate is currently less competitive.
+- In "Final recommendation", the highest-ranked candidate MUST be identified as the strongest candidate.
+- Only shortlisted candidates may be recommended to proceed.
+- Candidates not shortlisted MUST be described as less competitive.
+- Do not contradict the ranking, shortlist, or scores under any circumstance.
 
 Rules:
 - Be concise and professional.
@@ -137,7 +146,6 @@ Rules:
 - Use plain text bullet points or numbered lines for rankings.
 - Keep the final recommendation strict and evidence-based.
 - Do not speculate about personality, adaptability, eagerness to learn, future growth, or training potential unless explicitly provided in the input.
-- For weaker candidates, state that they are currently less competitive based on the available scoring results.
 """.strip()
 
 
@@ -175,7 +183,7 @@ def generate_fallback_report(
             f"Risk: {candidate.get('risk_level', 'Unknown')})"
         )
 
-    strongest_candidate = shortlist[0]["name"] if shortlist else "No candidate"
+    strongest_candidate = ranked_candidates[0]["name"] if ranked_candidates else "No candidate"
     next_candidate = shortlist[1]["name"] if len(shortlist) > 1 else "No additional candidate"
     less_competitive_candidate = (
         ranked_candidates[-1]["name"] if ranked_candidates else "No candidate"
@@ -251,11 +259,18 @@ def generate_report_text(
     Returns:
         Final report text.
     """
+    top_candidate = ranked_candidates[0]["name"] if ranked_candidates else "Unknown"
+    shortlisted_names = [candidate.get("name", "Unknown") for candidate in shortlist]
+    less_competitive_candidate = ranked_candidates[-1]["name"] if ranked_candidates else "Unknown"
+
     prompt = build_report_prompt(
         job_description=job_description,
         ranked_candidates=ranked_candidates,
         shortlist=shortlist,
         ranking_summary=ranking_summary,
+        top_candidate=top_candidate,
+        shortlisted_names=shortlisted_names,
+        less_competitive_candidate=less_competitive_candidate,
     )
 
     try:
