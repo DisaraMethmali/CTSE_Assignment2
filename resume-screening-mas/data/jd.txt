@@ -1,0 +1,24 @@
+Job Title: Senior Backend Engineer
+
+We are looking for an experienced Backend Engineer to join our team.
+
+Requirements:
+- Minimum 3 years of professional software development experience
+- Strong proficiency in Python
+- Experience with SQL and relational databases
+- Hands-on experience with Docker and containerization
+- Experience building and consuming REST APIs
+
+Nice to Have:
+- Experience with Kubernetes and container orchestration
+- AWS cloud services experience
+- FastAPI framework experience
+
+Responsibilities:
+- Design and build scalable backend services
+- Write clean, maintainable, well-tested code
+- Collaborate with frontend and DevOps teams
+- Participate in code reviews and technical discussions
+
+Location: Colombo, Sri Lanka
+Employment Type: Full-Time
