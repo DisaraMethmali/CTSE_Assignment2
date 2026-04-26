@@ -2,6 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from agents.member3_risk_scoring import run_member3
+from agents.member2_job_fit_analysis import run_job_fit_agent
 from state.shared_state import save_state, load_state
 
 JD_PATH          = "data/jd.txt"
@@ -16,13 +17,15 @@ def main() -> None:
     Path("outputs").mkdir(exist_ok=True)
     Path("logs").mkdir(exist_ok=True)
 
-    
     state = {
+        "job_description": Path(JD_PATH).read_text(encoding="utf-8"),
         "job_requirements": {
             "required_skills":    REQUIRED_SKILLS,
             "preferred_skills":   PREFERRED_SKILLS,
             "minimum_experience": REQUIRED_YEARS,
         },
+
+        # Member 3 reads this
         "candidates": [
             {
                 "name":             "Anne Perera",
@@ -40,6 +43,39 @@ def main() -> None:
                 "experience_years": 5,
             },
         ],
+
+        # Member 2 reads this
+        "parsed_candidates": [
+            {
+                "candidate_id":     "cand_001",
+                "name":             "Anne Perera",
+                "skills":           ["Python", "SQL", "Docker", "FastAPI", "AWS"],
+                "experience_years": 4,
+                "education":        "BSc in Computer Science",
+                "certifications":   [],
+                "projects":         [],
+            },
+            {
+                "candidate_id":     "cand_002",
+                "name":             "John Silva",
+                "skills":           ["Python", "REST APIs"],
+                "experience_years": 2,
+                "education":        "BSc in IT",
+                "certifications":   [],
+                "projects":         [],
+            },
+            {
+                "candidate_id":     "cand_003",
+                "name":             "Kasun Fernando",
+                "skills":           ["Python", "SQL", "Docker", "REST APIs", "Kubernetes"],
+                "experience_years": 5,
+                "education":        "BSc in Software Engineering",
+                "certifications":   [],
+                "projects":         [],
+            },
+        ],
+
+        # Member 3 reads this
         "fit_analyses": [
             {
                 "candidate_name":         "Anne Perera",
@@ -54,6 +90,13 @@ def main() -> None:
                 "missing_critical_skills": [],
             },
         ],
+
+        "fit_results":       [],
+        "scoring_results":   [],
+        "scored_candidates": [],
+        "ranked_candidates": [],
+        "final_report":      "",
+        "execution_trace":   [],
     }
     save_state(state)
 
@@ -65,7 +108,16 @@ def main() -> None:
     print("\n" + "="*50)
     print("MEMBER 2 — Job Fit Analysis Agent")
     print("="*50)
-    print("  [Not implemented yet — using dummy fit_analyses]")
+    state = load_state()
+    state = run_job_fit_agent(state)
+    save_state(state)
+    fit_results = state.get("fit_results", [])
+    for r in fit_results:
+        print(f"  {r['candidate_name']}: fit_level={r['fit_level']}")
+        if r.get("missing_critical_skills"):
+            print(f"    Missing: {', '.join(r['missing_critical_skills'])}")
+        if r.get("fit_reasoning"):
+            print(f"    Reasoning: {r['fit_reasoning']}")
 
     print("\n" + "="*50)
     print("MEMBER 3 — Risk and Scoring Agent")
