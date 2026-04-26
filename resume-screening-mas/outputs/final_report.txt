@@ -1,0 +1,21 @@
+1. Role summary
+Backend Developer role requiring Python, SQL, Docker, and a minimum of 2 years' experience.
+
+2. Candidate ranking
+- Rank 1: Kasun Fernando - Strong match with required backend and infrastructure skills, scores 65.0, low risk level.
+- Rank 2: Anne Perera - Matches all core skills, exceeds experience requirement, scores 60.0, medium risk level due to identified need for improvement in Docker and SQL skills.
+- Rank 3: John Silva - Strong backend fit but lacks Docker and SQL expertise, scores 30.0, high risk level due to missing critical skills and insufficient experience.
+
+3. Shortlisted candidates
+- Kasun Fernando (Rank 1)
+- Anne Perera (Rank 2)
+
+4. Key strengths
+- Kasun Fernando: Strong match with required backend and infrastructure skills.
+- Anne Perera: Matches all core skills, exceeds experience requirement.
+
+5. Key risks or weaknesses
+- John Silva: Missing critical skills in SQL and Docker, insufficient experience, overall profile is a weak match for this role.
+
+6. Final recommendation
+The strongest candidate for the Backend Developer position is Kasun Fernando (Rank 1). It is recommended that he proceeds to the next stage, along with Anne Perera (Rank 2), who matches all core skills and exceeds the experience requirement. John Silva's (Rank 3) application indicates a need for improvement in Docker and SQL skills, as well as insufficient experience, making him less competitive at this time.
