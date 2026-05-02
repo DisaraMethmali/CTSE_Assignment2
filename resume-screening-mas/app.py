@@ -3,7 +3,7 @@ app.py — CV Upload Dashboard + Integrated Results Viewer
 Run:  python app.py
 Then: python crew.py
 Then: python generate_dashboard.py
-Visit: http://localhost:5000
+Visit: http://localhost:8000
 """
 from __future__ import annotations
 
@@ -1740,6 +1740,6 @@ function updateCount(n) {
 
 if __name__ == "__main__":
     print("=" * 55)
-    print("  CV Screening Dashboard  →  http://localhost:5000")
+    print("  CV Screening Dashboard  →  http://localhost:8000")
     print("=" * 55)
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8000)

@@ -1,10 +1,10 @@
 {
-  "total_candidates": 2,
-  "shortlisted_count": 2,
+  "total_candidates": 1,
+  "shortlisted_count": 1,
   "highest_score": 45.0,
-  "lowest_score": 25.0,
+  "lowest_score": 45.0,
   "risk_distribution": {
-    "Medium": 2
+    "Medium": 1
   },
-  "generated_at": "2026-05-01T10:01:58.727823"
+  "generated_at": "2026-05-02T09:00:03.864845"
 }

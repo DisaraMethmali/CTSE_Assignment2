@@ -1,21 +1,18 @@
-### Final Hiring Report
+1. Role summary
+The selected candidate, Cv Disara Methmali, is a standout individual due to their exceptional proficiency in Python and Docker.
 
-#### Role Summary
-The selected candidate is Cv Disara Methmali for the position of [Job Title], due to their demonstrated skills and fit with the job requirements.
+2. Candidate ranking
+• 1. Cv Disara Methmali: 45.0/45.0
+    • Ranked highest based on the provided score.
+    • The other candidates were deemed less competitive or unsuitable for the job due to various factors, such as lack of experience in related fields.
 
-#### Candidate Ranking
-1. Cv Disara Methmali (Rank: 1, Score: 45.0)
-2. Dulansa Sethmali (Rank: 2)
+3. Shortlisted candidates
+• Cv Disara Methmali
 
-#### Shortlisted Candidates
-The following candidates are shortlisted:
-- Cv Disara Methmali
-- Dulansa Sethmali
+4. Key strengths
+• Proficiency in Python and Docker, notable asset for this role
+• Limited experience in related fields, but suitable for the task at hand
 
-#### Key Strengths
-- Cv Disara Methmali:
-	+ Proficient in Python and Docker, aligning with job requirements.
-	+ Demonstrates strong fit reasoning for the role, despite lack of relevant experience.
-
-- Dulansa Sethmali:
-	+ Aligns with job requirements for containerization, suggesting a solid foundation.
+5. Key risks or weaknesses
+• Lack of experience in related fields, makes them less suitable for the job
+• Risk flags: ['Experience duration not stated on resume']

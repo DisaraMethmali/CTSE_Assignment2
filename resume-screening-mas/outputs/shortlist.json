@@ -6,19 +6,8 @@
     "risk_flags": [
       "Experience duration not stated on resume"
     ],
-    "fit_reasoning": "The candidate's proficiency in Python and Docker is notable but does not align with the job requirements, which specifically call for experience working with similar skills. Overall, their lack of relevant experience makes it challenging to assess how well they fit the role.",
-    "score_reasoning": "Based on the provided information, it appears that the candidate has limited to no relevant work experience. This lack of experience may impact their ability to perform the job requirements effectively.",
+    "fit_reasoning": "The candidate's proficiency in Python and Docker is a notable asset, but their lack of experience in related fields makes them less suitable for the job.",
+    "score_reasoning": "Based on the provided information, it appears that the candidate has limited experience in related fields, making them less suitable for the job.",
     "rank": 1
-  },
-  {
-    "name": "Dulansa Sethmali",
-    "score": 25.0,
-    "risk_level": "Medium",
-    "risk_flags": [
-      "Experience duration not stated on resume"
-    ],
-    "fit_reasoning": "Dulansa's experience and knowledge of Docker align with the requirements for the job, suggesting a strong foundation in containerization. However, his lack of relevant technical skills other than Python is notable and may limit his potential to contribute effectively in certain aspects of the role.",
-    "score_reasoning": "Given the lack of information about Dulansa's work experience, it is reasonable to assume that they have limited or no relevant experience for this role. This may impact their ability to contribute effectively in certain aspects of the job.",
-    "rank": 2
   }
 ]
