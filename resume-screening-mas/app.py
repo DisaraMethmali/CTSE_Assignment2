@@ -391,27 +391,27 @@ UPLOAD_HTML = r"""<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:        #0C0E13;
-  --surface:   #13161E;
-  --surface2:  #1A1E29;
-  --border:    #252A38;
-  --border2:   #2E3447;
-  --text:      #E8EAF0;
-  --muted:     #5C6480;
-  --dim:       #3A4060;
-  --accent:    #4F8EF7;
-  --accent2:   #2563EB;
-  --green:     #34D399;
-  --green-bg:  #0D2B20;
-  --green-dim: #1A4535;
-  --amber:     #FBBF24;
-  --amber-bg:  #2A1F07;
-  --amber-dim: #3D2D0A;
-  --red:       #F87171;
-  --red-bg:    #2A0F0F;
-  --red-dim:   #3D1515;
-  --blue-bg:   #0D1829;
-  --blue-dim:  #162240;
+  --bg:        #F4F5F7;
+  --surface:   #FFFFFF;
+  --surface2:  #F0F1F5;
+  --border:    #DDE0EA;
+  --border2:   #C8CCDB;
+  --text:      #1A1D2E;
+  --muted:     #6B7399;
+  --dim:       #9BA3C4;
+  --accent:    #2563EB;
+  --accent2:   #1D4ED8;
+  --green:     #059669;
+  --green-bg:  #ECFDF5;
+  --green-dim: #A7F3D0;
+  --amber:     #D97706;
+  --amber-bg:  #FFFBEB;
+  --amber-dim: #FDE68A;
+  --red:       #DC2626;
+  --red-bg:    #FEF2F2;
+  --red-dim:   #FECACA;
+  --blue-bg:   #EFF6FF;
+  --blue-dim:  #BFDBFE;
   --mono: 'DM Mono', monospace;
   --sans: 'DM Sans', sans-serif;
   --display: 'Syne', sans-serif;
@@ -446,6 +446,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 200;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 .brand {
   display: flex;
@@ -770,14 +771,14 @@ body {
   white-space: nowrap;
 }
 .btn-primary { background: var(--accent2); color: #fff; }
-.btn-primary:hover { background: #1d4ed8; }
+.btn-primary:hover { background: #1e40af; }
 .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
 .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
 .btn-ghost:hover { border-color: var(--muted); }
 .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red-dim); }
 .btn-danger:hover { background: var(--red-bg); }
-.btn-success { background: #065f46; color: var(--green); border: 1px solid #064e3b; }
-.btn-success:hover { background: #047857; }
+.btn-success { background: #d1fae5; color: var(--green); border: 1px solid var(--green-dim); }
+.btn-success:hover { background: #a7f3d0; }
 
 /* ── Result rows ── */
 .result-item {
@@ -867,6 +868,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .stat-label {
   font-family: var(--mono);
@@ -894,6 +896,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   grid-template-columns: 38px 1fr;
   gap: 12px;
   transition: border-color 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .cand-card:hover { border-color: var(--border2); }
 .avatar {
@@ -908,10 +911,10 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   font-weight: 700;
   flex-shrink: 0;
 }
-.av0 { background: #162240; color: #60a5fa; }
-.av1 { background: #0d2b20; color: #34d399; }
-.av2 { background: #2a1f07; color: #fbbf24; }
-.av3 { background: #270d2a; color: #c084fc; }
+.av0 { background: #DBEAFE; color: #1D4ED8; }
+.av1 { background: #D1FAE5; color: #065F46; }
+.av2 { background: #FEF3C7; color: #92400E; }
+.av3 { background: #EDE9FE; color: #6D28D9; }
 .cand-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
 .cand-meta {
   font-family: var(--mono);
@@ -975,6 +978,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   gap: 12px;
   align-items: start;
   transition: border-color 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .score-card:hover { border-color: var(--border2); }
 .score-card.top { border-left: 2px solid var(--accent); }
@@ -1016,6 +1020,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   border-radius: 8px;
   padding: 14px 16px;
   margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .fit-card-grid { display: grid; grid-template-columns: 38px 1fr auto; gap: 12px; align-items: start; }
 
@@ -1027,6 +1032,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .ranked-table th {
   background: var(--surface2);
@@ -1053,6 +1059,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .report-title {
   font-family: var(--mono);
@@ -1069,7 +1076,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   max-height: 420px;
   overflow-y: auto;
   font-size: 12px;
-  color: #a0a8c0;
+  color: var(--muted);
   line-height: 1.7;
 }
 
@@ -1103,7 +1110,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: var(--surface2);
+  background: var(--surface);
   border: 1px solid var(--border2);
   color: var(--text);
   border-radius: var(--r);
@@ -1116,7 +1123,7 @@ input::placeholder, textarea::placeholder { color: var(--dim); }
   transition: all 0.2s;
   pointer-events: none;
   max-width: 280px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
 }
 #toast.show { opacity: 1; transform: translateY(0); }
 
@@ -1674,12 +1681,12 @@ async function loadDashboard() {
         .replace(/^### (.+)$/gm, '<h4 style="font-size:12px;color:var(--accent);margin:10px 0 4px">$1</h4>')
         .replace(/^## (.+)$/gm,  '<h3 style="font-size:13px;color:var(--text);margin:12px 0 5px">$1</h3>')
         .replace(/^# (.+)$/gm,   '<h2 style="font-size:14px;color:var(--text);margin:14px 0 6px">$1</h2>')
-        .replace(/^\s*[-*] (.+)$/gm, '<li style="margin:2px 0 2px 16px;font-size:11px;color:#a0a8c0">$1</li>')
+        .replace(/^\s*[-*] (.+)$/gm, '<li style="margin:2px 0 2px 16px;font-size:11px;color:var(--muted)">$1</li>')
         .split('\n').map(line => {
           const s = line.trim();
           if (!s) return '<div style="height:5px"></div>';
           if (s.startsWith('<')) return s;
-          return `<p style="font-size:12px;color:#a0a8c0;margin:2px 0;line-height:1.7">${s}</p>`;
+          return `<p style="font-size:12px;color:var(--muted);margin:2px 0;line-height:1.7">${s}</p>`;
         }).join('\n');
 
       const metaHtml = Object.keys(meta).length
