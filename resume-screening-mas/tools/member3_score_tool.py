@@ -18,6 +18,12 @@ def calculate_candidate_score(
         - Preferred skills:       15 points max
         - Critical skill penalty: -10 per missing critical (capped at -30)
 
+    Note:
+        Experience-related entries (e.g. "3+ yrs exp") are excluded from the
+        critical skill penalty because experience is already penalised via the
+        experience_score component. Counting it twice would unfairly zero-out
+        candidates whose years were not explicitly stated on their resume.
+
     Args:
         candidate_skills:        Skills from the candidate resume.
         required_skills:         Must-have skills from the JD.
@@ -45,12 +51,15 @@ def calculate_candidate_score(
     )
 
     # Experience score — 30 points max
+    # Unknown years gets a neutral 0.5 ratio instead of a punishing 0.3,
+    # because absence of an explicit year count on a CV is not the same
+    # as having no experience.
     if required_years is not None and candidate_years is not None:
         exp_ratio = min(candidate_years / max(required_years, 1), 1.0)
     elif candidate_years is not None:
         exp_ratio = 0.7
     else:
-        exp_ratio = 0.3
+        exp_ratio = 0.5   # unknown → neutral, not punishing
     experience_score = round(exp_ratio * 30, 2)
 
     # Preferred skills score — 15 points max
@@ -61,8 +70,14 @@ def calculate_candidate_score(
     preferred_score = round(pref_ratio * 15, 2)
 
     # Critical skill penalty — capped at -30
+    # Strip experience-related tokens (e.g. "3+ yrs exp") so experience is
+    # not penalised twice (once here and once in experience_score above).
+    skill_only_missing = [
+        s for s in missing_critical_skills
+        if not any(kw in s.lower() for kw in ("yr", "year", "exp"))
+    ]
     critical_penalty = round(
-        max(-30.0, len(missing_critical_skills) * -10.0), 2
+        max(-30.0, len(skill_only_missing) * -10.0), 2
     )
 
     # Final base score clamped 0-100
@@ -114,6 +129,9 @@ def detect_risk_flags(
     flags: list[str] = []
 
     for skill in missing_critical_skills:
+        # Skip experience pseudo-skills — handled separately below
+        if any(kw in skill.lower() for kw in ("yr", "year", "exp")):
+            continue
         flags.append(f"Missing critical skill: {skill}")
 
     if candidate_years is None:

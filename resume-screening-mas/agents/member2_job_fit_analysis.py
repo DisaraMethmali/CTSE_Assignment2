@@ -1,171 +1,193 @@
-# agents/member2_job_fit_analysis.py
+"""
+agents/member2_fit_agent.py
+Member 2 — Job Fit Analysis Agent
+
+Responsibilities:
+  - Read parsed_candidates and job_requirements from shared state
+  - Use deterministic tools to compute structural skill/experience matches
+  - Call the LLM (llama3.2:1b via Ollama HTTP API) to produce fit reasoning
+  - Write fit_analyses back to shared state
+
+Model: llama3.2:1b  (local Ollama)
+Tool:  tools/member2_parse_jd.py  (already provided — parse_job_description,
+                                    match_candidate_to_job)
+"""
+from __future__ import annotations
 
 import json
 import logging
-from typing import Dict, Any
+from typing import Any
 
-import ollama
+import requests
 
+from state.shared_state import load_state, save_state, log_agent_event
 from tools.member2_parse_jd import parse_job_description, match_candidate_to_job
-from state.shared_state import save_state, log_agent_event
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("Member2_FitAgent")
 
-MODEL_NAME = "qwen2.5:7b"
-
-SYSTEM_PROMPT = """You are a Job Fit Analysis Agent working in a professional hiring system.
-
-Your job is to compare a candidate's profile against the requirements of a job description.
-
-You will receive:
-1. The job requirements (skills, experience, education)
-2. A candidate profile (skills, experience, education)
-3. A preliminary structural comparison result
-
-Your task is to:
-- Identify which required skills the candidate clearly meets
-- Identify which required skills the candidate partially meets (similar but not exact)
-- Identify which required skills are missing
-- Assess experience fit
-- Assess education fit
-- Classify the overall fit level as: Strong, Moderate, or Weak
-- Write a clear one-paragraph explanation
-
-Rules:
-- Do NOT overstate the candidate's suitability
-- Do NOT invent skills the candidate does not have
-- If evidence is unclear, say so honestly
-- Return ONLY valid JSON. No preamble. No extra text.
-
-Return this exact JSON structure:
-{
-  "candidate_id": "string",
-  "candidate_name": "string",
-  "matched_skills": ["skill1", "skill2"],
-  "partial_matches": ["skill3"],
-  "missing_critical_skills": ["skill4"],
-  "experience_fit": "Meets requirement" or "Does not meet requirement" or "Unclear",
-  "education_fit": "Relevant" or "Not relevant" or "Not specified",
-  "fit_level": "Strong" or "Moderate" or "Weak",
-  "fit_reasoning": "One paragraph explanation here."
-}
-"""
+OLLAMA_URL  = "http://localhost:11434/api/chat"
+MODEL_NAME  = "llama3.2:1b"
+AGENT_NAME  = "Member2_FitAgent"
 
 
-def run_job_fit_agent(state: Dict[str, Any]) -> Dict[str, Any]:
+# ─────────────────────────────────────────────────────────────
+# Internal LLM helper
+# ─────────────────────────────────────────────────────────────
+
+def _call_ollama(prompt: str) -> str:
     """
-    Job Fit Analysis Agent node for LangGraph.
+    Send a prompt to the local Ollama server and return the text reply.
 
-    Reads the job description and all parsed candidates from shared state,
-    runs fit analysis for each candidate using the qwen2.5:7b model,
-    and writes the results back to the shared state.
-
-    Args:
-        state: The shared LangGraph state dictionary.
-
-    Returns:
-        Updated state with 'fit_results' populated.
+    Raises:
+        RuntimeError: If Ollama is not reachable or the call fails.
     """
-    logger.info("=== Job Fit Analysis Agent started ===")
+    payload = {
+        "model": MODEL_NAME,
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": False,
+    }
+    try:
+        response = requests.post(OLLAMA_URL, json=payload, timeout=120)
+        response.raise_for_status()
+        return response.json()["message"]["content"]
+    except requests.exceptions.ConnectionError:
+        raise RuntimeError(
+            "Cannot reach Ollama at localhost:11434. "
+            "Make sure Ollama is running: `ollama serve`"
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Ollama call failed: {exc}") from exc
 
-    job_text = state.get("job_description", "")
-    parsed_candidates = state.get("parsed_candidates", [])
 
-    if not job_text:
-        logger.error("No job description found in state.")
-        return state
+# ─────────────────────────────────────────────────────────────
+# LLM fit reasoning for a single candidate
+# ─────────────────────────────────────────────────────────────
 
-    if not parsed_candidates:
-        logger.warning("No parsed candidates found in state.")
-        return state
+def _generate_fit_reasoning(
+    candidate_name: str,
+    matched_skills: list[str],
+    missing_critical_skills: list[str],
+    experience_gap: bool,
+    job_description: str,
+) -> str:
+    """
+    Ask the LLM to write a concise fit-reasoning sentence for this candidate.
 
-    # Step 1: Parse the job description using the tool
-    logger.info("Parsing job description using tool...")
-    job_requirements = parse_job_description(job_text)
-    state["job_requirements"] = job_requirements
-    logger.info(f"Job requirements extracted: {job_requirements}")
+    Returns a plain-text reasoning string (1–2 sentences).
+    """
+    matched_str = ", ".join(matched_skills) if matched_skills else "none"
+    missing_str = ", ".join(missing_critical_skills) if missing_critical_skills else "none"
+    exp_note    = "does NOT meet" if experience_gap else "meets"
 
-    fit_results = []
-
-    for candidate in parsed_candidates:
-        logger.info(f"Analysing candidate: {candidate.get('name', 'Unknown')}")
-
-        # Step 2: Run structural comparison using the tool
-        structural_comparison = match_candidate_to_job(candidate, job_requirements)
-
-        # Step 3: Build the prompt for the LLM
-        user_prompt = f"""
-Job Requirements:
-{json.dumps(job_requirements, indent=2)}
-
-Candidate Profile:
-{json.dumps(candidate, indent=2)}
-
-Preliminary Structural Comparison:
-{json.dumps(structural_comparison, indent=2)}
-
-Perform a full fit analysis and return the JSON result.
-"""
-
-        # Step 4: Call the LLM
-        try:
-            response = ollama.chat(
-                model=MODEL_NAME,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_prompt}
-                ]
-            )
-
-            raw_output = response["message"]["content"].strip()
-            logger.info(f"LLM raw output for {candidate.get('name')}: {raw_output[:200]}...")
-
-            # Step 5: Parse and validate the JSON output
-            fit_result = json.loads(raw_output)
-
-            # Ensure required fields exist
-            required_fields = [
-                "candidate_id", "candidate_name", "matched_skills",
-                "partial_matches", "missing_critical_skills",
-                "experience_fit", "education_fit", "fit_level", "fit_reasoning"
-            ]
-            for field in required_fields:
-                if field not in fit_result:
-                    fit_result[field] = "unknown"
-
-            fit_results.append(fit_result)
-            logger.info(f"Fit result for {candidate.get('name')}: {fit_result.get('fit_level')}")
-
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse LLM output as JSON for candidate "
-                         f"{candidate.get('name')}: {e}")
-            fit_results.append({
-                "candidate_id": candidate.get("candidate_id", "unknown"),
-                "candidate_name": candidate.get("name", "Unknown"),
-                "matched_skills": structural_comparison.get("matched_skills", []),
-                "partial_matches": [],
-                "missing_critical_skills": structural_comparison.get("missing_critical_skills", []),
-                "experience_fit": "Unclear",
-                "education_fit": "Unclear",
-                "fit_level": "Weak",
-                "fit_reasoning": "Could not parse LLM output. Structural comparison used as fallback."
-            })
-
-        except Exception as e:
-            logger.error(f"LLM call failed for candidate {candidate.get('name')}: {e}")
-
-    # Step 6: Write results back to shared state
-    state["fit_results"] = fit_results
-
-    # Save state to disk and log the event for observability
-    save_state(state)
-    log_agent_event(
-        agent_name="Job Fit Analysis Agent",
-        tool_called="parse_job_description, match_candidate_to_job",
-        input_summary=f"{len(parsed_candidates)} candidates analysed",
-        output_summary=f"{len(fit_results)} fit results produced"
+    prompt = (
+        f"You are an HR analyst evaluating job candidates.\n\n"
+        f"Job description summary:\n{job_description[:300]}\n\n"
+        f"Candidate        : {candidate_name}\n"
+        f"Matched skills   : {matched_str}\n"
+        f"Missing skills   : {missing_str}\n"
+        f"Experience       : candidate {exp_note} the minimum requirement\n\n"
+        f"Write ONE or TWO concise sentences explaining how well this candidate "
+        f"fits the role. Be objective. Do not add any preamble or labels."
     )
 
-    logger.info(f"=== Job Fit Analysis Agent completed. {len(fit_results)} candidates analysed. ===")
-    return state
+    return _call_ollama(prompt).strip()
+
+
+# ─────────────────────────────────────────────────────────────
+# Public agent entry-point
+# ─────────────────────────────────────────────────────────────
+
+def run_member2() -> None:
+    """
+    Load shared state, analyse every parsed candidate against the job,
+    write fit_analyses back to shared state.
+
+    Called by the pipeline runner (app_pipeline.py).
+    """
+    state = load_state()
+
+    job_description: str              = state.get("job_description", "")
+    job_requirements: dict[str, Any]  = state.get("job_requirements", {})
+
+    # Prefer parsed_candidates if Member 1 has already run; fall back to
+    # raw candidates so Member 2 can still run standalone.
+    candidates: list[dict[str, Any]] = (
+        state.get("parsed_candidates")
+        or state.get("candidates", [])
+    )
+
+    if not candidates:
+        logger.warning("No candidates found in shared state — skipping Member 2.")
+        state["fit_analyses"] = []
+        save_state(state)
+        return
+
+    # If job_requirements is sparse, try to enrich from job_description text
+    if not job_requirements.get("required_skills") and job_description:
+        logger.info("job_requirements empty — parsing from job_description text.")
+        job_requirements = parse_job_description(job_description)
+        state["job_requirements"] = job_requirements
+
+    fit_analyses: list[dict[str, Any]] = []
+
+    for candidate in candidates:
+        name = candidate.get("name", "Unknown")
+        logger.info("Analysing fit for candidate: %s", name)
+
+        # ── Step 1: deterministic structural match ─────────────
+        match_result = match_candidate_to_job(candidate, job_requirements)
+
+        matched_skills           = match_result.get("matched_skills", [])
+        missing_critical_skills  = match_result.get("missing_critical_skills", [])
+        experience_gap           = match_result.get("experience_gap", False)
+
+        # ── Step 2: LLM fit reasoning ──────────────────────────
+        try:
+            fit_reasoning = _generate_fit_reasoning(
+                candidate_name          = name,
+                matched_skills          = matched_skills,
+                missing_critical_skills = missing_critical_skills,
+                experience_gap          = experience_gap,
+                job_description         = job_description,
+            )
+        except RuntimeError as exc:
+            logger.error("LLM call failed for %s: %s", name, exc)
+            fit_reasoning = "Fit reasoning unavailable — LLM offline."
+
+        # ── Step 3: classify overall fit level ────────────────
+        if not missing_critical_skills and not experience_gap:
+            fit_level = "Strong"
+        elif len(missing_critical_skills) <= 1 and not experience_gap:
+            fit_level = "Moderate"
+        else:
+            fit_level = "Weak"
+
+        # ── Step 4: assemble fit analysis entry ───────────────
+        fit_entry: dict[str, Any] = {
+            "candidate_name":          name,
+            "matched_skills":          matched_skills,
+            "missing_critical_skills": missing_critical_skills,
+            "experience_gap":          experience_gap,
+            "fit_level":               fit_level,
+            "fit_reasoning":           fit_reasoning,
+        }
+
+        fit_analyses.append(fit_entry)
+
+        log_agent_event(
+            agent_name     = AGENT_NAME,
+            tool_called    = "match_candidate_to_job",
+            input_summary  = f"candidate={name}",
+            output_summary = (
+                f"fit_level={fit_level}, "
+                f"matched={len(matched_skills)}, "
+                f"missing={len(missing_critical_skills)}"
+            ),
+        )
+
+    state["fit_analyses"] = fit_analyses
+    save_state(state)
+
+    logger.info(
+        "Member 2 complete — %d fit analyses saved.", len(fit_analyses)
+    )

@@ -244,7 +244,7 @@ def generate_report_text(
     ranked_candidates: list[dict[str, Any]],
     shortlist: list[dict[str, Any]],
     ranking_summary: dict[str, Any],
-    model_name: str = "mistral:7b",
+    model_name: str = "llama3.2:1b",
 ) -> str:
     """
     Call the Ollama model to generate the final recruiter report.
@@ -288,7 +288,7 @@ def generate_report_text(
 
 def member4_ranking_report_node(
     state: MASState,
-    model_name: str = "mistral:7b",
+    model_name: str = "llama3.2:1b",
     top_n: int = 3,
 ) -> MASState:
     """
