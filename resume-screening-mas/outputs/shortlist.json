@@ -1,0 +1,13 @@
+[
+  {
+    "name": "Cv Disara Methmali",
+    "score": 45.0,
+    "risk_level": "Medium",
+    "risk_flags": [
+      "Experience duration not stated on resume"
+    ],
+    "fit_reasoning": "The candidate's proficiency in Python and Docker is a notable asset, but their lack of experience in related fields makes them less suitable for the job.",
+    "score_reasoning": "Based on the provided information, it appears that the candidate has limited experience in related fields, making them less suitable for the job.",
+    "rank": 1
+  }
+]
