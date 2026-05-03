@@ -1,21 +1,25 @@
-### Final Hiring Report
+1. Role summary:
+The role requires candidates with strong skills in Python, SQL, Docker, REST APIs, Git, and experience that meets the minimum requirements.
 
-#### Role Summary
-The selected candidate is Cv Disara Methmali for the position of [Job Title], due to their demonstrated skills and fit with the job requirements.
+2. Candidate ranking:
+- Rank 1: Jayarathna G W N R 2 - Score: 16.0, Risk level: High
+- Rank 2: Vinuji Palihakkara - Score: 8.0, Risk level: High
 
-#### Candidate Ranking
-1. Cv Disara Methmali (Rank: 1, Score: 45.0)
-2. Dulansa Sethmali (Rank: 2)
+3. Shortlisted candidates:
+- Jayarathna G W N R 2
 
-#### Shortlisted Candidates
-The following candidates are shortlisted:
-- Cv Disara Methmali
-- Dulansa Sethmali
+4. Key strengths:
+- Jayarathna G W N R 2 possesses the required Python and SQL skills.
+- He meets the minimum experience requirements for the role.
 
-#### Key Strengths
-- Cv Disara Methmali:
-	+ Proficient in Python and Docker, aligning with job requirements.
-	+ Demonstrates strong fit reasoning for the role, despite lack of relevant experience.
+5. Key risks or weaknesses:
+- Both shortlisted candidates have a high risk level, indicating significant gaps in their profiles.
+- Notable issues include missing critical skills such as Docker, REST APIs, and Git.
+- Overall profile weakly matches the required skills for this role.
 
-- Dulansa Sethmali:
-	+ Aligns with job requirements for containerization, suggesting a solid foundation.
+6. Final recommendation:
+The strongest candidate is Jayarathna G W N R 2 (Rank 1), who has the required Python and SQL skills but lacks experience with Docker, REST APIs, and Git. He meets the minimum experience requirements despite these gaps. 
+
+However, due to his high risk level and overall profile not being a strong match for the role, he is still considered less competitive compared to other candidates who might have a better balance of required skills. Nonetheless, Jayarathna G W N R 2 will proceed to the next stage as there are no other candidates shortlisted.
+
+Vinuji Palihakkara (Rank 2) has been deemed less competitive due to his missing critical skills in SQL and additional technologies listed. Both candidates require further development or training to meet the full requirements of the role.
